@@ -82,6 +82,8 @@ const MultiSelector = <T extends BaseOption,>({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedOptions]);
 
+    const noResultsFound = searchTerm && !loading && options.length === 0;
+
     return (
         <div className="flex flex-col gap-2 relative" onKeyDown={onEscape}>
             {/* Input Wrapper */}
@@ -105,7 +107,7 @@ const MultiSelector = <T extends BaseOption,>({
                 />
                 {loading && <MultiSelectLoading />}
                 {
-                    searchTerm && !loading && options.length === 0 && (<p className="text-xl scale-150 leading-[0]">🤷‍♂️</p>)
+                    noResultsFound && (<p className="text-xl scale-150 leading-[0]">🤷‍♂️</p>)
                 }
                 <button
                     aria-expanded={showOptions}
@@ -141,6 +143,9 @@ const MultiSelector = <T extends BaseOption,>({
                     </ul>
                 </div>
             )}
+            {
+                noResultsFound && (<p className="text-sm">No results found :/</p>)
+            }
         </div>
     )
 }
