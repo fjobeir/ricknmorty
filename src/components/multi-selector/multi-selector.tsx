@@ -83,7 +83,7 @@ const MultiSelector = <T extends BaseOption,>({
     }, [selectedOptions]);
 
     return (
-        <div className="flex relative" onKeyDown={onEscape}>
+        <div className="flex flex-col gap-2 relative" onKeyDown={onEscape}>
             {/* Input Wrapper */}
             <div className="border-2 border-solid border-gray-400 py-2 px-3 rounded-xl w-full flex items-center gap-2">
                 {
@@ -103,6 +103,10 @@ const MultiSelector = <T extends BaseOption,>({
                     }}
                     onKeyDown={handleKeyDown}
                 />
+                {loading && <MultiSelectLoading />}
+                {
+                    searchTerm && !loading && options.length === 0 && (<p className="text-xl scale-150 leading-[0]">🤷‍♂️</p>)
+                }
                 <button
                     aria-expanded={showOptions}
                     disabled={options.length === 0}
@@ -116,35 +120,33 @@ const MultiSelector = <T extends BaseOption,>({
                 </button>
             </div>
             {/* Options Wrapper */}
-            {
-                (searchTerm && showOptions) && (
-                    <div className="absolute z-10 top-full mt-1 border-2 border-solid border-gray-400 overflow-hidden rounded-xl w-full bg-gray-400 h-60">
-                        {/* Internal wrapper so the scrollbar doesn't affect the border and the options don't come over rounded corners */}
-                        <ul className="flex flex-col overflow-auto h-60 gap-0.5" ref={targetRef} tabIndex={-1}>
-                            {
-                            options.map((option, i) => {
-                                const selected = selectedOptions.some((selectedOption) => selectedOption.id === option.id);
-                                return (
-                                    <Render
-                                        focused={focusedIndex === i}
-                                        searchTerm={searchTerm}
-                                        key={`option${option.id }`}
-                                        setSelected={setSelectedOptions}
-                                        option={option}
-                                        selected={selected} 
-                                        onArrowDown={onOptionArrowDown}
-                                        onArrowUp={onOptionArrowUp}
-                                    />
-                                )
-                            })
-                        }
-                        </ul>
+            
+            {(searchTerm && showOptions && options.length > 0) && (
+                <div className="absolute z-10 top-full mt-1 border-2 border-solid border-gray-400 overflow-hidden rounded-xl w-full bg-gray-400 max-h-60">
+                    {/* Internal wrapper so the scrollbar doesn't affect the border and the options don't come over rounded corners */}
+                    <ul className="flex flex-col overflow-auto max-h-60 gap-0.5" ref={targetRef} tabIndex={-1}>
                         {
-                            loading && (<MultiSelectLoading />)
-                        }
-                    </div>
-                )
-            }
+                        options.map((option, i) => {
+                            const selected = selectedOptions.some((selectedOption) => selectedOption.id === option.id);
+                            return (
+                                <Render
+                                    focused={focusedIndex === i}
+                                    searchTerm={searchTerm}
+                                    key={`option${option.id }`}
+                                    setSelected={setSelectedOptions}
+                                    option={option}
+                                    selected={selected} 
+                                    onArrowDown={onOptionArrowDown}
+                                    onArrowUp={onOptionArrowUp}
+                                />
+                            )
+                        })
+                    }
+                    </ul>
+                </div>
+            )}
+
+            
             
         </div>
     )

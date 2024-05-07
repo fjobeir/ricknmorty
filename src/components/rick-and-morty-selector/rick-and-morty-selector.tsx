@@ -7,7 +7,7 @@ import fetcher from "../../utils/swr-fetcher";
 
 const getKey = (pageIndex: number, previousPageData: RMApiResponse | null, character: string) => {
   if (!character) return null
-  if (previousPageData && !previousPageData.results?.length) return null;
+  if (previousPageData && !previousPageData?.results?.length) return null;
   return `https://rickandmortyapi.com/api/character?name=${character}&page=${pageIndex + 1}`
 }
 
@@ -21,7 +21,7 @@ const RickAndMortySelector: FC = () => {
     const pagesCount = useMemo(() => data?.[0]?.info?.pages, [data]);
 
     const allCharacters = useMemo(() => {
-        return data?.map((page) => page.results).flat()
+        return data?.map((page) => page?.results ?? []).flat() ?? []
     }, [data]);
 
     return (
