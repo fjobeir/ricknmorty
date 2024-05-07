@@ -1,4 +1,4 @@
-import { ComponentType, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ComponentType, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { BaseOption, OptionType } from "../../types/multi-selector";
 import SelectedItem from "./selected-item";
 import useScrollEnd from "../../hooks/use-scroll-end";
@@ -30,12 +30,22 @@ const MultiSelector = <T extends BaseOption,>({
     loading,
 }: Props<T>) => {
 
+    const multiSelectorRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [selectedOptions, setSelectedOptions] = useState<Array<T>>(defaultSelectedOptions);
     const [showOptions, setShowOptions] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        onInputChange?.(e.target.value);
+        setSearchTerm(e.target.value);
+        if (!showOptions) {
+            setShowOptions(true);
+            inputRef.current?.focus();
+        }
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'ArrowDown') {
@@ -45,6 +55,8 @@ const MultiSelector = <T extends BaseOption,>({
             console.log('ArrowDown')
             // focus the next option (first if there is no focused option)
             setFocusedIndex((prevIndex) => Math.min(prevIndex + 1, options.length - 1));
+        } else if (e.key === 'Backspace' && searchTerm === '' && selectedOptions.length > 0) {
+            setSelectedOptions((prevSelected) => prevSelected.slice(0, prevSelected.length - 1));
         }
     };
 
@@ -64,7 +76,6 @@ const MultiSelector = <T extends BaseOption,>({
             return Math.max(prevIndex - 1, -1)
         });
     }
-
    const targetRef = useScrollEnd(() => {
         if (onScrollEnd) {
             onScrollEnd()
@@ -82,13 +93,28 @@ const MultiSelector = <T extends BaseOption,>({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedOptions]);
 
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (multiSelectorRef.current && !multiSelectorRef.current.contains(e.target as Node)) {
+                setShowOptions(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [multiSelectorRef]);
+
     const noResultsFound = searchTerm && !loading && options.length === 0;
 
     return (
-        <div className="flex flex-col gap-2 relative" onKeyDown={onEscape}>
+        <div className="flex flex-col gap-2 relative" onKeyDown={onEscape} ref={multiSelectorRef}>
             {/* Input Wrapper */}
             <div className="border-2 border-solid border-gray-400 py-2 px-3 rounded-xl w-full flex items-center gap-2">
-                {
+                <div className="w-full flex items-center flex-wrap gap-2">
+                    {
                     selectedOptions.map((selectedOption) => (
                         <SelectedItem key={selectedOption.id} item={selectedOption} onRemove={() => {
                             setSelectedOptions((prevSelected) => prevSelected.filter((option) => option.id !== selectedOption.id))
@@ -97,14 +123,12 @@ const MultiSelector = <T extends BaseOption,>({
                 }
                 <input
                     ref={inputRef}
-                    className="flex w-full text-sm min-w-8 outline-none h-7"
+                    className="flex flex-1 text-sm min-w-8 outline-none h-7"
                     placeholder="Type a character name"
-                    onChange={(e) => {
-                        onInputChange?.(e.target.value);
-                        setSearchTerm(e.target.value);
-                    }}
+                    onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                 />
+                </div>
                 {loading && <MultiSelectLoading />}
                 {
                     noResultsFound && (<p className="text-xl scale-150 leading-[0]">🤷‍♂️</p>)
