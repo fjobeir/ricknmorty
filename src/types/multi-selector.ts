@@ -8,6 +8,9 @@ export interface BaseOption {
 export type OptionType<T> = {
     searchTerm: string;
     option: T;
-    selected: boolean, 
+    selected: boolean,
+    focused: boolean;
+    onArrowDown?: () => void;
+    onArrowUp: () => void;
     setSelected: Dispatch<SetStateAction<Array<T>>>
 }

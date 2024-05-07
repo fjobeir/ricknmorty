@@ -1,5 +1,4 @@
 import { FC, useMemo, useState } from "react";
-// import { ApiResponse, Character, Info, getCharacters } from "rickmortyapi";
 import MultiSelector from "../multi-selector/multi-selector";
 import RickMortyOptionRow from "./rick-and-morty-option-row";
 import useSWRInfinite from "swr/infinite";
@@ -44,12 +43,20 @@ const RickAndMortySelector: FC = () => {
                 loading={isLoading}
             />
             <div className="flex flex-col gap-3">
-                <p>Two main components are created</p>
-                <ul className="list-outside list-disc">
-                    <li><span className="font-bold">MultiSelector</span>: a generic multi selector that has a search field and some event listeners</li>
+                <h4 className="font-bold">Two main components are created</h4>
+                <ul className="list-inside list-disc">
+                    <li><span className="font-bold">MultiSelector</span>: a generic multi selector that has a search field, some event listeners and the required state management to store (and pass) the selected options</li>
                     <li><span className="font-bold">RickAndMortySelector</span>: uses the <code className="bg-sky-100 px-2 py-0.5">MultiSelector</code> component to show characters and set which component will be rendered for each option</li>
                 </ul>
-                <p>Because the case does not mention what should happen when the user checks so many options, I have added an attribute <code className="bg-sky-100 px-2 py-0.5">maxSelectableOptions</code> and set it to 2 in this sample</p>
+                <p>So basically I wanted to introduce a skeleton of a multi selector that can be used in different ways where RickAndMortySelector is an example</p>
+                <p>Because the case does not mention what should happen when the user checks so many options, I have added the property <code className="bg-sky-100 px-2 py-0.5">maxSelectableOptions</code> and set it to 2 in this sample</p>
+                <h4 className="font-bold">Keyboard Events</h4>
+                <ul className="list-inside list-disc">
+                    <li>Escape: Hide the options list</li>
+                    <li>Arrow Down: Focus the next option</li>
+                    <li>Arrow Up: Focus the previous option</li>
+                    <li>Space: Select the focused option</li>
+                </ul>
             </div>
         </div>
 

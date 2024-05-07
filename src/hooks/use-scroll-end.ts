@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 function useScrollEnd(callback: () => void, delay: number = 200) {
-  const targetRef = useRef<HTMLDivElement | null>(null);
+  const targetRef = useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
      // If target element is not available, do nothing
